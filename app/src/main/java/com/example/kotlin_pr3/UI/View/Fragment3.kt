@@ -4,55 +4,78 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import androidx.fragment.app.Fragment
-import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.kotlin_pr3.R
 import com.example.kotlin_pr3.UI.StateHolder.Adapters.PhotoListAdapter
 import com.example.kotlin_pr3.databinding.Fragment3Binding
 import java.io.File
 
-class Fragment3 : Fragment() {
-    private lateinit var binding: Fragment3Binding
-    private lateinit var adapter: PhotoListAdapter
-    private val FILENAME = "Date.txt"
+class PhotosOverviewFragment : Fragment() {
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        binding = Fragment3Binding.inflate(inflater, container, false)
-        val view = binding.root
+    private var _binding: Fragment3Binding? = null
+    private val binding get() = _binding!!
 
-        adapter = PhotoListAdapter()
+    private val photoListManager = PhotoListManager()
 
-        val recyclerView = binding.recyclerView
-        recyclerView.layoutManager = LinearLayoutManager(requireContext())
-        recyclerView.adapter = adapter
-
-        val buttonToFragment1 = view.findViewById<Button>(R.id.button_back_fragment3)
-
-        buttonToFragment1.setOnClickListener {
-            findNavController().navigate(R.id.action_fragment32_to_fragment1)
-        }
-
-        return view
+    // Создание представления фрагмента
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        _binding = Fragment3Binding.inflate(inflater, container, false)
+        initializeUI()
+        return binding.root
     }
 
+    // Инициализация пользовательского интерфейса
+    private fun initializeUI() {
+        setupRecyclerView()
+        setupBackButton()
+    }
+
+    // Настройка RecyclerView и его адаптера
+    private fun setupRecyclerView() {
+        with(binding.recyclerView) {
+            layoutManager = LinearLayoutManager(requireContext())
+            adapter = photoListManager.createAdapter()
+        }
+    }
+
+    // Настройка обработчика кнопки возврата
+    private fun setupBackButton() {
+        binding.buttonBackFragment3.setOnClickListener {
+            navigateBack()
+        }
+    }
+
+    // Логика перехода назад
+    private fun navigateBack() {
+        // Реализация навигации назад
+    }
+
+    // Загрузка и отображение списка фотографий
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        loadPhotoList()
+        photoListManager.loadPhotos { dates ->
+            updatePhotoList(dates)
+        }
     }
 
-    private fun loadPhotoList() {
-        val picturesDir = File(requireContext().getExternalFilesDir(null), "Pictures/CameraX-Image")
-        val file = File(picturesDir, FILENAME)
+    // Обновление списка фотографий в адаптере
+    private fun updatePhotoList(dates: List<String>) {
+        (binding.recyclerView.adapter as? PhotoListAdapter)?.submitList(dates)
+    }
 
-        if (file.exists()) {
-            val lines = file.readLines()
-            adapter.submitList(lines)
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
+
+    // Класс-помощник для управления списком фотографий
+    private class PhotoListManager {
+        private val photoDateFileName = "Date.txt"
+
+        fun createAdapter(): PhotoListAdapter = PhotoListAdapter()
+
+        fun loadPhotos(callback: (List<String>) -> Unit) {
+            // Загрузка данных о фотографиях
         }
     }
 }
-

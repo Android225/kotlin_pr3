@@ -9,28 +9,38 @@ import com.example.kotlin_pr3.R
 
 class PhotoListAdapter : RecyclerView.Adapter<PhotoListAdapter.PhotoViewHolder>() {
 
+    // Список строк, каждая из которых представляет дату фотографии
+    private var data: List<String> = emptyList()
+
+    // Класс ViewHolder, используемый для отображения каждого элемента списка
     class PhotoViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        // TextView для отображения даты фотографии
         val dateTextView: TextView = itemView.findViewById(R.id.dateTextView)
     }
 
-    private var data: List<String> = emptyList()
-
+    // Создание нового экземпляра ViewHolder
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PhotoViewHolder {
-        val itemView = LayoutInflater.from(parent.context).inflate(R.layout.list_item_photo, parent, false)
-        return PhotoViewHolder(itemView)
+        // Инфлейтинг (создание) View из XML-макета для каждого элемента списка
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.list_item_photo, parent, false)
+        return PhotoViewHolder(view)
     }
 
+    // Привязка данных к ViewHolder
     override fun onBindViewHolder(holder: PhotoViewHolder, position: Int) {
-        val item = data[position]
-        holder.dateTextView.text = item
+        // Установка текста в TextView, соответствующего дате фотографии
+        holder.dateTextView.text = data[position]
     }
 
-    override fun getItemCount(): Int {
-        return data.size
-    }
+    // Возвращает общее количество элементов в списке
+    override fun getItemCount(): Int = data.size
 
+    // Обновление списка данных для отображения в RecyclerView
     fun submitList(list: List<String>) {
+        // Обновление внутреннего списка данных
         data = list
+        // Уведомление адаптера о том, что данные изменились
         notifyDataSetChanged()
     }
+
+    // Дополнительные методы могут быть добавлены здесь
 }
